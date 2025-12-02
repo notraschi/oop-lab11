@@ -46,32 +46,35 @@ public final class LambdaFilter extends JFrame {
          * Commands.
          */
         IDENTITY("No modifications", Function.identity()),
-        TOLOWER("to lowercase", s ->
-            s.chars()
-                .map(Character::toLowerCase)
-                .collect(StringBuilder::new,
-                    StringBuilder::appendCodePoint,
-                    StringBuilder::append)
-                .toString()
-        ),
+        TOLOWER("to lowercase", String::toLowerCase),
+        //     chars()
+        //         .map(Character::toLowerCase)
+        //         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+        //         .toString()
+        // ),
         COUNTLINES("count lines", s -> String.valueOf(s.lines().count())),
-        ALPHABETICAL("arrange in alphabetical order", s ->
-            s.lines()
-                .flatMap(l -> Arrays.stream(l.split(" ")))
+        ALPHABETICAL(
+            "arrange in alphabetical order",
+            s -> Arrays.stream(s.split("\\s"))
+                // .flatMap(l -> Arrays.stream(l.split(" ")))
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .map(word -> word + " ")
+                // .map(word -> word + " ")
+                .collect(Collectors.joining(" "))
+        ),
+        WORDCOUNT(
+            "get count of words",
+            s -> Arrays.stream(s.split("\\s"))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+            // final Map<String, Integer> map = new LinkedHashMap<>();
+            // s.lines()
+            //     .flatMap(l -> Arrays.stream(l.split(" ")))
+            //     .forEach(word -> map.merge(word, 1, Integer::sum));
+            // return map.entrySet().stream()
+                .map(entry -> entry.getKey() + " -> " + entry.getValue() + " ")
                 .collect(Collectors.joining())
         ),
-        WORDCOUNT("get count of words", s -> {
-            final Map<String, Integer> map = new LinkedHashMap<>();
-            s.lines()
-                .flatMap(l -> Arrays.stream(l.split(" ")))
-                .forEach(word -> map.merge(word, 1, Integer::sum));
-            return map.entrySet().stream()
-                .map(entry -> entry.getKey() + " -> " + entry.getValue() + " ")
-                .collect(Collectors.joining());
-        }),
-        COUNTCHARS("count chars", s -> String.valueOf(s.chars().count()));
+        COUNTCHARS("count chars", s -> String.valueOf(s.length()));//chars().count()));
 
         private final String commandName;
         private final Function<String, String> fun;
