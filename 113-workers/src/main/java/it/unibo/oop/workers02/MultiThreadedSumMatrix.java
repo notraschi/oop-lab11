@@ -59,8 +59,9 @@ public class MultiThreadedSumMatrix implements SumMatrix {
 
     /**
      * simple worker iterates over a portion of the list.
+     * making it {@code static} yields marginally better performance.
      */
-    private class Worker extends Thread {
+    private static class Worker extends Thread {
         private final double[] list;
         private final int start;
         private final int len;
